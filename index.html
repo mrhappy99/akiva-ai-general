@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akiva Prell — AI Creative Producer & Filmmaker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+    * { box-sizing: border-box; }
+    *,*:before,*:after { outline: none !important; }
+    *:focus-visible { outline: 2px solid rgba(255,218,42,0.45) !important; outline-offset: 2px; }
+    video, video:focus, video:focus-visible { outline: none !important; border: none !important; box-shadow: none !important; }
+    a:focus, button:focus { outline: none !important; }
+    body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .font-display { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+    .project-card { transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1); background: #0a0a0f; border: 1px solid #27272a; }
+    .project-card:hover { border-color: #3f3f46; transform: translateY(-2px); }
+    .nav-scrolled { background-color: rgba(5, 5, 5, 0.96); backdrop-filter: blur(20px); }
+    .tier-header { font-size: 13px; letter-spacing: 2px; font-weight: 600; }
+    .poster { height: 190px; object-fit: cover; border-radius: 12px; width: 100%; background: #111; }
+    .poster-lg { height: 260px; object-fit: cover; border-radius: 16px; width: 100%; background: #111; }
+    @keyframes glow-flash { 0%, 100% { opacity: 1; text-shadow: 0 0 0 rgba(255,218,42,0); } 50% { opacity: 0.85; text-shadow: 0 0 14px rgba(255,218,42,0.55); } }
+    .glow-flash { animation: glow-flash 2.4s ease-in-out infinite; }
+    /* HERO VIDEO */
+    .hero-wrap { position: relative; overflow: hidden; }
+    .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(1.08) saturate(0.96) brightness(1.05); }
+    .hero-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,5,5,0.45) 0%, rgba(5,5,5,0.22) 35%, rgba(5,5,5,0.62) 78%, rgba(5,5,5,0.92) 100%); }
+    .hero-noise::after{ content:""; position:absolute; inset:0; background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 3px 3px; pointer-events:none; }
+    /* Flags */
+    .flag-chip { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.03); padding: 6px 12px 6px 8px; border-radius: 999px; }
+    .flag-svg { width: 26px; height: 18px; border-radius: 3px; overflow:hidden; display:block; box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset; }
+    /* Bands */
+    .singh-band { background: radial-gradient(1100px 500px at 15% -10%, rgba(255,218,42,0.07), transparent 60%), radial-gradient(900px 500px at 100% 0%, rgba(255,180,0,0.06), transparent 55%), #0a0a0f; border: 1px solid rgba(255,255,255,0.08); }
+    .fit-band { background: radial-gradient(1000px 500px at 50% 0%, rgba(255,218,42,0.08), transparent 65%), #0c0c0c; border: 1px solid rgba(255,218,42,0.14); }
+    .expand-toggle { margin-top:12px; display:inline-flex; align-items:center; gap:6px; background:none; border:none; color: var(--al-gold); font-size:13px; font-weight:600; cursor:pointer; padding:0; }
+    .expand-toggle i { font-size:10px; transition: transform 0.2s ease; }
+    .expand-toggle.open i { transform: rotate(180deg); }
+    .expand-panel { display:none; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); font-size:13.5px; line-height:1.6; color:rgba(255,255,255,0.7); }
+    .expand-panel.open { display:block; }
+    .stat-num { font-family:'Space Grotesk', sans-serif; font-weight:700; letter-spacing:-0.02em; }
+    .section-eyebrow { font-size: 12px; letter-spacing: 2.5px; font-weight: 600; }
+    ::selection { background: #FFDA2A; color:#050505; }
+    :root { --al-gold: #FFDA2A; }
+    .al-gold { color: var(--al-gold) !important; }
+    .bg-al-gold { background-color: var(--al-gold) !important; }
+    .text-al-gold { color: var(--al-gold) !important; }
+    .border-al-gold { border-color: var(--al-gold) !important; }
+    .laurel-card { text-align:center; padding: 12px 20px; }
+    .laurel-svg { width: 150px; height: 42px; margin: 0 auto; display:block; }
+    /* Inline play-to-video component */
+    .inline-video-wrap { position:relative; width:100%; }
+    .inline-video-poster { position:relative; cursor:pointer; }
+    .inline-video-poster img { display:block; }
+    .inline-play-btn { position:absolute; inset:0; margin:auto; width:64px; height:64px; border-radius:999px; background:rgba(5,5,5,0.55); border:1.5px solid rgba(255,255,255,0.6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; transition: all 0.2s ease; }
+    .inline-video-poster:hover .inline-play-btn { background: var(--al-gold); border-color: var(--al-gold); color:#050505; transform: scale(1.06); }
+    .media-16x9 { position:relative; width:100%; aspect-ratio: 16 / 9; border-radius:16px; overflow:hidden; background:#111; }
+    .media-16x9 img, .media-16x9 video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+    .media-16x9 video { object-fit:contain; background:#000; }
+    @keyframes gentle-wiggle {
+        0%, 100% { transform: rotate(-2.5deg); }
+        50% { transform: rotate(2.5deg); }
+    }
+    .wiggle-anim { animation: gentle-wiggle 3.2s ease-in-out infinite; transform-origin: center; }
+    /* Slate cards */
+    .slate-card { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px 22px; display:flex; align-items:flex-start; gap: 16px; }
+    .slate-num { font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:13px; color: var(--al-gold); opacity:0.7; min-width:22px; padding-top:2px; }
+    /* Pixie-style teaser card */
+    .pixie-card { background:#111; border:1px solid rgba(255,255,255,0.1); border-radius:16px; overflow:hidden; }
+    .pixie-tag { display:inline-block; background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.85); font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; letter-spacing:0.5px; }
+    .pixie-cta-btn { width:100%; padding:12px 16px; border-radius:10px; background:rgba(0,205,205,0.18); border:1px solid rgba(0,205,205,0.35); color:#00CDCD; font-size:12px; font-weight:700; letter-spacing:1.5px; text-align:center; transition: background 0.2s; cursor:default; }
+    /* NDA lock styling */
+    .nda-lock { position:relative; border-radius:20px; overflow:hidden; }
+    .nda-lock-overlay { position:absolute; inset:0; background:rgba(5,5,5,0.82); backdrop-filter:blur(6px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; border-radius:20px; z-index:5; }
+    .nda-lock-badge { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); padding:8px 16px; border-radius:999px; font-size:12px; font-weight:600; color:rgba(255,255,255,0.7); letter-spacing:1.5px; }
+    /* Skill chip */
+    .skill-chip { display:inline-flex; align-items:center; gap:6px; background:rgba(255,218,42,0.08); border:1px solid rgba(255,218,42,0.2); color:rgba(255,218,42,0.85); font-size:11px; font-weight:700; letter-spacing:1px; padding:4px 10px; border-radius:6px; }
+
+    /* ===== DEMO MODAL ===== */
+    #demoModal { display:none; position:fixed; inset:0; z-index:200; background:rgba(5,5,5,0.92); backdrop-filter:blur(16px); align-items:center; justify-content:center; padding:20px; }
+    #demoModal.open { display:flex; }
+    .demo-modal-inner { width:100%; max-width:1200px; max-height:calc(100vh - 40px); overflow-y:auto; }
+    .demo-modal-close { position:absolute; top:20px; right:24px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:22px; cursor:pointer; transition:color 0.2s; z-index:10; }
+    .demo-modal-close:hover { color:#fff; }
+    .demo-vid-label { font-size:11px; letter-spacing:2px; font-weight:700; text-transform:uppercase; }
+    .demo-vid-sub { font-size:12px; color:rgba(255,255,255,0.45); margin-top:4px; line-height:1.4; }
+</style>
+</head>
+<body class="bg-[#050505] text-zinc-200">
+
+    <!-- NAV -->
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#050505]/0 transition-colors duration-300" id="mainnav">
+        <div class="max-w-6xl mx-auto px-8 py-5 flex items-center justify-between">
+            <div class="font-semibold tracking-tight text-[19px]">Akiva Prell</div>
+            <div class="flex items-center gap-x-6 text-sm font-medium overflow-x-auto">
+                <a href="#credentials" class="hidden sm:inline hover:text-white text-white/60 transition-colors whitespace-nowrap">Background</a>
+                <a href="#singh" class="hidden sm:inline hover:text-white text-white/60 transition-colors whitespace-nowrap">SINGh</a>
+                <a href="#slate" class="hidden sm:inline hover:text-white text-white/60 transition-colors whitespace-nowrap">Slate of 10</a>
+                <a href="mailto:akiva@agncgroup.com" class="px-4 py-1.5 rounded-full text-[#050505] bg-[#FFDA2A] font-semibold text-xs tracking-wide hover:bg-yellow-300 transition-colors">Get in Touch</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero-wrap hero-noise" style="height: 92vh; min-height: 580px; display: flex; align-items: flex-end;">
+        <video id="heroVideo" class="hero-video" autoplay muted loop playsinline preload="auto">
+            <source src="assets/video/hero_video.mp4" type="video/mp4">
+        </video>
+        <div class="hero-scrim"></div>
+        <div class="relative z-10 max-w-6xl mx-auto px-8 pb-10 w-full">
+            <div class="max-w-[700px]">
+                <div class="inline-block text-xs font-semibold tracking-[2px] al-gold mb-2">AI CREATIVE PRODUCER · FILMMAKER · STORYTELLER</div>
+                <h1 class="text-5xl md:text-7xl tracking-[-3px] font-bold leading-[0.96] font-display">The frontier of AI filmmaking.</h1>
+                <p class="mt-4 text-xl text-white/80 leading-snug max-w-[580px]">10 AI productions — films, series, music videos, pilot episodes, and brand demonstrations — purpose-built to show what's actually possible today.</p>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button onclick="openDemoModal()" class="px-5 py-2.5 rounded-full bg-[#FFDA2A] text-[#050505] font-semibold text-sm hover:bg-yellow-300 transition-colors">Watch the Demo</button>
+                    <a href="#singh" class="px-5 py-2.5 rounded-full border border-white/25 text-white text-sm font-medium hover:border-white/50 transition-colors">See the Work</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CREDENTIALS ===== -->
+    <div id="credentials" class="max-w-6xl mx-auto px-8 pt-16 pb-2">
+
+        <div class="fit-band rounded-[28px] p-7 md:p-10 mb-10">
+            <div class="section-eyebrow al-gold mb-4">THE BACKGROUND</div>
+            <h2 class="text-2xl md:text-3xl font-semibold tracking-tight leading-snug text-white max-w-3xl font-display">
+                Over a decade in filmmaking and creative technology — <span class="al-gold">now at the frontier of AI production.</span>
+            </h2>
+            <p class="mt-4 text-[15px] text-white/65 leading-relaxed max-w-3xl">Storytelling, public speaking, creative strategy, and two-plus years of daily hands-on production across every leading AI tool. Not experimenting — shipping features, pilots, trailers, music videos, and brand demonstrations that have been in front of Hollywood's top executives.</p>
+
+            <div class="mt-8 grid sm:grid-cols-3 gap-4">
+                <div class="bg-[#050505] border border-white/10 rounded-2xl p-5 text-center">
+                    <div class="stat-num text-4xl al-gold">10+</div>
+                    <div class="text-xs text-white/50 mt-1">Years in filmmaking, creative technology, content production &amp; media innovation</div>
+                </div>
+                <div class="bg-[#050505] border border-white/10 rounded-2xl p-5 text-center">
+                    <div class="stat-num text-4xl al-gold">2+</div>
+                    <div class="text-xs text-white/50 mt-1">Years in daily production with all leading AI tools — every day, at the frontier</div>
+                </div>
+                <div class="bg-[#050505] border border-white/10 rounded-2xl p-5 text-center">
+                    <div class="stat-num text-4xl al-gold">10</div>
+                    <div class="text-xs text-white/50 mt-1">Productions in the slate — films, series, music videos, brand demos, ads, pilots</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- ===== LAUREL QUOTES ===== -->
+    <div class="max-w-6xl mx-auto px-8 pt-12 pb-2">
+        <div class="section-eyebrow al-gold mb-6 text-center">INDUSTRY RESPONSE</div>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="laurel-card">
+                <svg class="laurel-svg" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="none" stroke="var(--al-gold)" stroke-width="1.6" opacity="0.85">
+                        <path d="M100 55 C 70 50, 45 40, 34 18 C 42 22, 50 24, 58 22 C 48 18, 40 12, 36 4 C 45 8, 53 9, 60 6 C 52 4, 46 -1, 44 -8"/>
+                        <path d="M100 55 C 60 48, 30 34, 18 10"/>
+                        <path d="M120 55 C 150 50, 175 40, 186 18 C 178 22, 170 24, 162 22 C 172 18, 180 12, 184 4 C 175 8, 167 9, 160 6 C 168 4, 174 -1, 176 -8"/>
+                        <path d="M120 55 C 160 48, 190 34, 202 10"/>
+                    </g>
+                </svg>
+                <p class="mt-4 text-[15px] text-white/85 italic leading-relaxed">"Which part of this is AI? How did you do that? The best I've seen."</p>
+                <div class="mt-4 text-xs tracking-wide al-gold font-medium">— Academy Award-Winning Producer of Terminator &amp; Mortal Kombat</div>
+            </div>
+            <div class="laurel-card">
+                <svg class="laurel-svg" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="none" stroke="var(--al-gold)" stroke-width="1.6" opacity="0.85">
+                        <path d="M100 55 C 70 50, 45 40, 34 18 C 42 22, 50 24, 58 22 C 48 18, 40 12, 36 4 C 45 8, 53 9, 60 6 C 52 4, 46 -1, 44 -8"/>
+                        <path d="M100 55 C 60 48, 30 34, 18 10"/>
+                        <path d="M120 55 C 150 50, 175 40, 186 18 C 178 22, 170 24, 162 22 C 172 18, 180 12, 184 4 C 175 8, 167 9, 160 6 C 168 4, 174 -1, 176 -8"/>
+                        <path d="M120 55 C 160 48, 190 34, 202 10"/>
+                    </g>
+                </svg>
+                <p class="mt-4 text-[15px] text-white/85 italic leading-relaxed">"The best AI I've seen, and a great f#@%ing story."</p>
+                <div class="mt-4 text-xs tracking-wide al-gold font-medium">— CEO of Fremantle</div>
+            </div>
+            <div class="laurel-card">
+                <svg class="laurel-svg" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="none" stroke="var(--al-gold)" stroke-width="1.6" opacity="0.85">
+                        <path d="M100 55 C 70 50, 45 40, 34 18 C 42 22, 50 24, 58 22 C 48 18, 40 12, 36 4 C 45 8, 53 9, 60 6 C 52 4, 46 -1, 44 -8"/>
+                        <path d="M100 55 C 60 48, 30 34, 18 10"/>
+                        <path d="M120 55 C 150 50, 175 40, 186 18 C 178 22, 170 24, 162 22 C 172 18, 180 12, 184 4 C 175 8, 167 9, 160 6 C 168 4, 174 -1, 176 -8"/>
+                        <path d="M120 55 C 160 48, 190 34, 202 10"/>
+                    </g>
+                </svg>
+                <p class="mt-4 text-[15px] text-white/85 italic leading-relaxed">"This is soooo impressive! It's so great. Just a clear home run."</p>
+                <div class="mt-4 text-xs tracking-wide al-gold font-medium">— Original Productions (OP)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SINGH — EXHIBIT A ===== -->
+    <div id="singh" class="max-w-6xl mx-auto px-8 pt-10 pb-2">
+        <div class="singh-band rounded-[32px] p-6 md:p-10">
+
+            <div class="flex flex-wrap gap-2 mb-4">
+                <span class="skill-chip">NARRATIVE FEATURE PRODUCTION</span>
+                <span class="skill-chip">AI VISUAL DIRECTION</span>
+                <span class="skill-chip">MULTI-COUNTRY ORIGINAL SOUNDTRACK</span>
+            </div>
+
+            <div id="singhOpeningBlock" class="inline-video-wrap mb-8">
+                <div class="inline-video-poster media-16x9" onclick="playInlineVideo('singhOpeningBlock')">
+                    <img src="assets/video/compressed/singh_opening_scenes_poster.jpg" alt="SINGh Opening Scenes">
+                    <div class="inline-play-btn"><i class="fa-solid fa-play" style="margin-left:3px"></i></div>
+                </div>
+                <div class="media-16x9" style="display:none;">
+                    <video controls playsinline>
+                        <source src="assets/video/compressed/singh_opening_scenes.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+            <div class="mb-2 text-xs text-white/40">SINGh — Opening 5 Minutes</div>
+
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <div class="flag-chip">
+                    <span class="flag-svg"><svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="60" height="13.3" y="0" fill="#FF9933"/><rect width="60" height="13.3" y="13.3" fill="#FFFFFF"/><rect width="60" height="13.4" y="26.6" fill="#138808"/><circle cx="30" cy="20" r="4.2" fill="none" stroke="#000080" stroke-width="0.6"/><circle cx="30" cy="20" r="0.7" fill="#000080"/></svg></span>
+                    <span class="flag-svg"><svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="60" height="40" fill="#B22234"/><g fill="#FFFFFF"><rect y="3.08" width="60" height="3.08"/><rect y="9.23" width="60" height="3.08"/><rect y="15.38" width="60" height="3.08"/><rect y="21.54" width="60" height="3.08"/><rect y="27.69" width="60" height="3.08"/><rect y="33.85" width="60" height="3.08"/></g><rect width="26" height="21.5" fill="#3C3B6E"/></svg></span>
+                </div>
+                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-fuchsia-950 text-fuchsia-300 tracking-wider">ROM-COM + MICRO-DRAMA MARKET OPENER</span>
+            </div>
+
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight font-display leading-[1.03]">SING<em class="italic">h</em></h2>
+            <p class="mt-2 text-sm al-gold font-semibold tracking-wide">Produced. Not promised.</p>
+            <p class="mt-3 text-white/50 text-sm">Feature Film | Romantic Comedy, with Crossover Soundtrack &nbsp;•&nbsp; <a href="https://singhthemovie.com/" target="_blank" class="text-[#FFDA2A]/80 hover:underline">singhthemovie.com</a></p>
+            <p class="mt-4 max-w-3xl text-lg text-white/85 leading-snug">World's first AI Rom-Com Musical Feature Film <span class="al-gold font-bold">+</span> with a multi-country soundtrack <span class="al-gold font-bold">+</span> tour strategy <span class="al-gold font-bold">+</span> created by a <span class="text-white font-medium">#1 Charting Music Producer</span> <span class="al-gold font-bold">+</span> <span class="text-white font-medium">Film Marketer</span>.</p>
+
+            <div class="mt-12">
+                <div class="tier-header al-gold mb-4">A PROVEN, UNDER-SERVED, HIGHLY-CONCENTRATED AUDIENCE</div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-[#050505] border border-white/10 rounded-2xl p-5"><div class="stat-num text-3xl al-gold">5.2M</div><div class="text-xs text-white/50 mt-1">Indian diaspora, U.S.</div></div>
+                    <div class="bg-[#050505] border border-white/10 rounded-2xl p-5"><div class="stat-num text-3xl al-gold">1.9M</div><div class="text-xs text-white/50 mt-1">Indian diaspora, Canada</div></div>
+                    <div class="bg-[#050505] border border-white/10 rounded-2xl p-5"><div class="stat-num text-3xl al-gold">1.8M</div><div class="text-xs text-white/50 mt-1">Indian diaspora, UK</div></div>
+                    <div class="bg-[#050505] border border-white/10 rounded-2xl p-5"><div class="stat-num text-3xl al-gold">1.4B</div><div class="text-xs text-white/50 mt-1">Home market, India</div></div>
+                </div>
+            </div>
+
+            <!-- TRAILER -->
+            <div class="mt-8">
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="skill-chip">STORY STRUCTURE</span>
+                    <span class="skill-chip">CHARACTER PERFORMANCE</span>
+                    <span class="skill-chip">VISUAL CONTINUITY</span>
+                </div>
+                <div class="tier-header al-gold mb-4">SINGH — TRAILER</div>
+                <div id="singhTrailerBlock" class="inline-video-wrap">
+                    <div class="inline-video-poster media-16x9" onclick="playInlineVideo('singhTrailerBlock')">
+                        <img src="assets/images/singh_key_art.jpg" alt="SINGh Trailer">
+                        <div class="inline-play-btn"><i class="fa-solid fa-play" style="margin-left:3px"></i></div>
+                    </div>
+                    <div class="media-16x9" style="display:none;">
+                        <video controls playsinline>
+                            <source src="assets/video/singh_trailer.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== SLATE OF 10 ===== -->
+    <div id="slate" class="max-w-6xl mx-auto px-8 pt-16 pb-2">
+        <div class="section-eyebrow al-gold mb-2">THE PORTFOLIO</div>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight font-display mb-2">A Slate of 10</h2>
+        <p class="text-white/60 text-[15px] max-w-2xl mb-10 leading-relaxed">SINGh is one of 10 AI productions purpose-built to demonstrate the future of AI-powered filmmaking — to studios, production companies, and creative partners.</p>
+
+        <!-- NDA GATE — teaser peek + locked list -->
+        <div class="mt-6 rounded-[24px] border border-white/08 overflow-hidden">
+
+            <!-- Teaser: 1 Pixie-deck section visible as a peek -->
+            <div class="p-6 md:p-8 bg-[#0a0a0a]">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="text-xs font-semibold tracking-[2.5px] text-fuchsia-400">A GLIMPSE INSIDE THE SLATE</div>
+                    <div class="h-px flex-1 bg-white/08"></div>
+                </div>
+
+                <!-- 1000 Ways to Die — Pixie-style card -->
+                <div class="pixie-card">
+                    <div class="p-5 md:p-6">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="skill-chip">IP REVIVAL</span>
+                            <span class="skill-chip">FORMAT ADAPTATION</span>
+                            <span class="skill-chip">PRODUCTION COST REDUCTION</span>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold tracking-tight mb-5">Revive <span class="text-fuchsia-400">ANY SHOW</span> — any IP — with AI</h3>
+                        <div class="grid md:grid-cols-2 gap-6 items-start">
+                            <!-- Left: video -->
+                            <div>
+                                <div id="ways1000Block" class="inline-video-wrap">
+                                    <div class="inline-video-poster media-16x9" onclick="playInlineVideo('ways1000Block')">
+                                        <div style="position:absolute;inset:0;background:#181010;display:flex;align-items:center;justify-content:center;">
+                                            <span class="text-white/20 text-xs tracking-widest">1000 WAYS TO DIE</span>
+                                        </div>
+                                        <div class="inline-play-btn"><i class="fa-solid fa-play" style="margin-left:3px"></i></div>
+                                    </div>
+                                    <div class="media-16x9" style="display:none;">
+                                        <video controls playsinline>
+                                            <source src="assets/video/1000_ways_revival.mp4" type="video/mp4">
+                                        </video>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-xs text-white/35 italic">Watch the first episode of the AI revival.</div>
+                            </div>
+                            <!-- Right: info -->
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-[#222] flex items-center justify-center shrink-0">
+                                        <span class="text-[#FFDA2A] font-black text-[10px] text-center leading-tight">1000<br>WAYS</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-white text-[15px]">1,000 Ways to Die</div>
+                                        <div class="text-xs text-white/45">Original Productions (Fremantle)</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span class="pixie-tag">SPIKE</span>
+                                    <span class="pixie-tag">COMEDY CENTRAL</span>
+                                    <span class="pixie-tag">6 SEASONS</span>
+                                </div>
+                                <p class="text-[13px] text-fuchsia-400 font-semibold mb-1">We revived this exact IP with AI.</p>
+                                <p class="text-[13px] text-white/60 mb-3">Here's what OP said when they saw what we could do (that their own people could not):</p>
+                                <blockquote class="border-l-2 border-fuchsia-500 pl-3 mb-3">
+                                    <p class="text-[14px] text-white font-semibold italic leading-snug">"This is soooo impressive! It's so great. Just a clear home run."</p>
+                                    <div class="text-xs text-fuchsia-400 mt-1">— Original Productions (OP)</div>
+                                </blockquote>
+                                <div class="space-y-2 mt-4">
+                                    <div class="pixie-cta-btn">REDUCE COST + RISK BY 90%</div>
+                                    <div class="pixie-cta-btn">INCREASE SPEED BY 90%</div>
+                                    <div class="pixie-cta-btn">TEST MARKET WITH REAL DATA</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NDA locked section -->
+            <div class="relative overflow-hidden rounded-b-[24px]">
+                <!-- Show only 3 blurred cards as a peek, then cut off -->
+                <div class="px-6 md:px-8 pt-2 pb-0 bg-[#0a0a0a] space-y-2" style="filter:blur(2.5px); user-select:none; pointer-events:none; max-height:260px; overflow:hidden;">
+                    <div class="slate-card opacity-60"><div class="slate-num">02</div><div><div class="text-white font-semibold text-[15px] mb-1">Major Hollywood IP Revival(s)</div><div class="text-xs text-[#FFDA2A] font-semibold mb-2 tracking-wide">FRANCHISE REVIVAL · SERIES</div><p class="text-[13.5px] text-white/40">Content locked — available under NDA.</p></div></div>
+                    <div class="slate-card opacity-45"><div class="slate-num">03</div><div><div class="text-white font-semibold text-[15px] mb-1">Major Hollywood Star Revival(s)</div><div class="text-xs text-[#FFDA2A] font-semibold mb-2 tracking-wide">CHARACTER REVIVAL · DEMO</div><p class="text-[13.5px] text-white/40">Content locked — available under NDA.</p></div></div>
+                    <div class="slate-card opacity-30"><div class="slate-num">04</div><div><div class="text-white font-semibold text-[15px] mb-1">Pilots for 99% Less</div><div class="text-xs text-[#FFDA2A] font-semibold mb-2 tracking-wide">PILOT PRODUCTION · PROOF-OF-CONCEPT</div><p class="text-[13.5px] text-white/40">Content locked — available under NDA.</p></div></div>
+                    <div class="slate-card opacity-20"><div class="slate-num">05–10</div><div><div class="text-white font-semibold text-[15px] mb-1">+ 7 more productions</div><div class="text-xs text-[#FFDA2A] font-semibold mb-2 tracking-wide">NDA REQUIRED</div></div></div>
+                </div>
+
+                <!-- NDA overlay — tight, sits just below the visible cards -->
+                <div class="relative bg-[#0a0a0a] pb-7 pt-4 flex flex-col items-center gap-3" style="background: linear-gradient(180deg, rgba(10,10,10,0.0) 0%, rgba(10,10,10,0.97) 30%);">
+                    <div class="nda-lock-badge">
+                        <i class="fa-solid fa-lock text-white/60 text-xs"></i>
+                        <span>UNLOCKED WITH NDA</span>
+                    </div>
+                    <p class="text-white/40 text-[13px] text-center max-w-sm px-4">The remaining 9 productions are available under a standard NDA. <a href="mailto:akiva@agncgroup.com" class="text-[#FFDA2A]/70 hover:text-[#FFDA2A] underline transition-colors">Reach out</a> to get access.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== CAPABILITIES GRID ===== -->
+    <div class="max-w-6xl mx-auto px-8 pt-16 pb-4">
+        <div class="bg-[#0a0a0a] border border-[#FFDA2A]/15 rounded-[28px] p-8 md:p-10">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="md:w-1/2">
+                    <div class="section-eyebrow al-gold mb-4">WHAT I BRING</div>
+                    <p class="text-[17px] text-white font-semibold leading-snug mb-5 max-w-lg">Two years of daily AI production. A decade of storytelling. A slate that already opens doors.</p>
+                    <p class="text-[15px] text-white/75 leading-relaxed mb-4">Custom, high-impact productions and demonstrations designed for studio partnerships, creative meetings, and strategic conversations — built and ready to deploy now.</p>
+                    <p class="text-[16px] text-[#FFDA2A] font-semibold leading-snug">Produced, not promised.</p>
+                </div>
+                <div class="md:w-1/2 grid grid-cols-2 gap-3">
+                    <div class="bg-[#050505] border border-white/08 rounded-2xl p-5">
+                        <i class="fa-solid fa-trophy al-gold mb-3 text-lg"></i>
+                        <div class="text-sm font-semibold text-white mb-1">Proven Results</div>
+                        <div class="text-xs text-white/50 leading-relaxed">Hollywood production company praise, industry-leading quality, confirmation from A-list executives</div>
+                    </div>
+                    <div class="bg-[#050505] border border-white/08 rounded-2xl p-5">
+                        <i class="fa-solid fa-handshake al-gold mb-3 text-lg"></i>
+                        <div class="text-sm font-semibold text-white mb-1">Partnership-Ready</div>
+                        <div class="text-xs text-white/50 leading-relaxed">Custom demos and strategic materials that have opened real, validated conversations in Hollywood</div>
+                    </div>
+                    <div class="bg-[#050505] border border-white/08 rounded-2xl p-5">
+                        <i class="fa-solid fa-person-chalkboard al-gold mb-3 text-lg"></i>
+                        <div class="text-sm font-semibold text-white mb-1">Executive Presenter</div>
+                        <div class="text-xs text-white/50 leading-relaxed">10+ years of decisive, expert presentations at events, screenings, and private executive meetings</div>
+                    </div>
+                    <div class="bg-[#050505] border border-white/08 rounded-2xl p-5">
+                        <i class="fa-solid fa-bolt al-gold mb-3 text-lg"></i>
+                        <div class="text-sm font-semibold text-white mb-1">Rapid Execution</div>
+                        <div class="text-xs text-white/50 leading-relaxed">Proactive, idea-to-market execution — two years of daily, high-pressure AI production at the frontier</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="max-w-6xl mx-auto px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 mt-8">
+        <div class="text-[11px] text-white/40 tracking-widest">AKIVA PRELL &bull; AGNC GROUP</div>
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+            <a href="mailto:akiva@agncgroup.com" class="text-white/60 hover:text-white transition-colors">akiva@agncgroup.com</a>
+            <a href="https://singhthemovie.com/" target="_blank" class="text-[#FFDA2A]/80 hover:underline">singhthemovie.com</a>
+        </div>
+    </div>
+
+    <!-- ===== DEMO MODAL ===== -->
+    <div id="demoModal" role="dialog" aria-modal="true" aria-label="Watch SINGh">
+        <button class="demo-modal-close" onclick="closeDemoModal()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+        <div class="demo-modal-inner">
+            <div class="mb-6 text-center">
+                <div class="text-xs font-semibold tracking-[2.5px] al-gold mb-1">SINGH — WATCH BOTH</div>
+                <p class="text-white/50 text-sm">The trailer is the story. The first 5 minutes is the craft. Watch one or both.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Trailer -->
+                <div>
+                    <div class="demo-vid-label al-gold mb-1">The Trailer</div>
+                    <div class="demo-vid-sub mb-3">Best pacing for first impressions — the story, the heart, the hook.</div>
+                    <div id="modalTrailerBlock" class="inline-video-wrap">
+                        <div class="inline-video-poster media-16x9" onclick="playInlineVideo('modalTrailerBlock')">
+                            <img src="assets/images/singh_key_art.jpg" alt="SINGh Trailer">
+                            <div class="inline-play-btn"><i class="fa-solid fa-play" style="margin-left:3px"></i></div>
+                        </div>
+                        <div class="media-16x9" style="display:none;">
+                            <video controls playsinline>
+                                <source src="assets/video/singh_trailer.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <!-- First 5 Minutes -->
+                <div>
+                    <div class="demo-vid-label al-gold mb-1">First 5 Minutes</div>
+                    <div class="demo-vid-sub mb-3">The realism and the AI filmmaking. Shot for shot, this is better.</div>
+                    <div id="modalOpeningBlock" class="inline-video-wrap">
+                        <div class="inline-video-poster media-16x9" onclick="playInlineVideo('modalOpeningBlock')">
+                            <img src="assets/video/compressed/singh_opening_scenes_poster.jpg" alt="SINGh First 5 Minutes">
+                            <div class="inline-play-btn"><i class="fa-solid fa-play" style="margin-left:3px"></i></div>
+                        </div>
+                        <div class="media-16x9" style="display:none;">
+                            <video controls playsinline>
+                                <source src="assets/video/compressed/singh_opening_scenes.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Nav scroll
+        function init() {
+            const nav = document.getElementById('mainnav');
+            const toggle = () => nav.classList.toggle('nav-scrolled', window.scrollY > 30);
+            window.addEventListener('scroll', toggle);
+            toggle();
+        }
+        window.onload = init;
+
+        // Hero loop
+        (function () {
+            const hero = document.getElementById('heroVideo');
+            if (hero) {
+                hero.addEventListener('ended', function () {
+                    hero.currentTime = 0;
+                    hero.play();
+                });
+            }
+        })();
+
+        // Inline video swap
+        function playInlineVideo(containerId) {
+            const el = document.getElementById(containerId);
+            const poster = el.querySelector('.inline-video-poster');
+            const frame = el.querySelector('.media-16x9:not(.inline-video-poster)');
+            const video = frame.querySelector('video');
+            if (poster) poster.style.display = 'none';
+            frame.style.display = 'block';
+            video.muted = false;
+            video.play();
+        }
+
+        // Demo modal
+        function openDemoModal() {
+            const m = document.getElementById('demoModal');
+            m.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDemoModal() {
+            const m = document.getElementById('demoModal');
+            m.classList.remove('open');
+            document.body.style.overflow = '';
+            // pause any playing videos inside modal
+            m.querySelectorAll('video').forEach(v => { v.pause(); });
+            // reset modal video blocks back to poster state
+            ['modalTrailerBlock','modalOpeningBlock'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const poster = el.querySelector('.inline-video-poster');
+                const frame = el.querySelector('.media-16x9:not(.inline-video-poster)');
+                if (poster) poster.style.display = '';
+                if (frame) frame.style.display = 'none';
+            });
+        }
+        // Close modal on backdrop click
+        document.getElementById('demoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDemoModal();
+        });
+        // Close on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeDemoModal();
+        });
+    </script>
+</body>
+</html>
